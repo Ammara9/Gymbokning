@@ -24,8 +24,18 @@ namespace Gymbokning.Data
 
             await AddRolesAsync(roleNames);
 
-            var admin = await AddAccountAsync(adminEmail, "Abcd_1234");
-            var user = await AddAccountAsync(userEmail, "Abcd_1234");
+            var admin = await AddAccountAsync(
+                adminEmail,
+                "Abcd_1234",
+                "AdminFirstName",
+                "AdminLastName"
+            );
+            var user = await AddAccountAsync(
+                userEmail,
+                "Abcd_1234",
+                "UserFirstName",
+                "UserLastName"
+            );
 
             await AddUserToRoleAsync(admin, "Admin");
             await AddUserToRoleAsync(user, "User");
@@ -55,7 +65,12 @@ namespace Gymbokning.Data
             }
         }
 
-        private static async Task<ApplicationUser> AddAccountAsync(string accountEmail, string pw)
+        private static async Task<ApplicationUser> AddAccountAsync(
+            string accountEmail,
+            string pw,
+            string firstName,
+            string lastName
+        )
         {
             var found = await userManager.FindByEmailAsync(accountEmail);
 
@@ -66,6 +81,9 @@ namespace Gymbokning.Data
             {
                 UserName = accountEmail,
                 Email = accountEmail,
+                FirstName = firstName,
+                LastName = lastName,
+                TimeOfRegistration = DateTime.Now,
                 EmailConfirmed = true,
             };
 

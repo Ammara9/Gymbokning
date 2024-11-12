@@ -42,7 +42,7 @@ namespace Gymbokning.Controllers
 
             // Get the logged-in user
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(userId!);
 
             if (user == null)
                 return NotFound();
@@ -90,7 +90,7 @@ namespace Gymbokning.Controllers
                 return NotFound();
             }
 
-            // Load the gym class with its attending members and their email information
+            // Load the gym class with its attending members and their information
             var gymClass = await _context
                 .GymClasses.Include(g => g.AttendingMembers)
                 .ThenInclude(am => am.ApplicationUser) // Load related ApplicationUser data
