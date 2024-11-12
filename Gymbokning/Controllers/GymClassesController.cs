@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Gymbokning.Data;
 using Gymbokning.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -13,10 +16,62 @@ namespace Gymbokning.Controllers
     public class GymClassesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public GymClassesController(ApplicationDbContext context)
+        public GymClassesController(
+            UserManager<ApplicationUser> userManager,
+            ApplicationDbContext context
+        )
         {
             _context = context;
+            _userManager = userManager;
+        }
+
+        //BOOKING PASS
+        public async Task<IActionResult> BookingToggle(int id)
+        {
+            // Check if the gym class exists
+            var gymClass = await _context
+                .GymClasses.Include(g => g.AttendingMembers)
+                .ThenInclude(am => am.ApplicationUser) // Load related ApplicationUser data
+                .FirstOrDefaultAsync(g => g.Id == id);
+
+            if (gymClass == null)
+                return NotFound();
+
+            // Get the logged-in user
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+                return NotFound();
+
+            // Check if the user is already booked
+            var existingBooking = gymClass.AttendingMembers.FirstOrDefault(am =>
+                am.ApplicationUserId == userId
+            );
+
+            if (existingBooking != null)
+            {
+                // If already booked, unbook by removing from the join table
+                _context.Entry(existingBooking).State = EntityState.Deleted;
+            }
+            else
+            {
+                // If not booked, create a new booking
+                var newBooking = new ApplicationUserGymClass
+                {
+                    GymClassId = gymClass.Id,
+                    ApplicationUserId = user.Id,
+                };
+                _context.Add(newBooking);
+            }
+
+            // Save changes to the database
+            await _context.SaveChangesAsync();
+
+            // Redirect to the Details view for the specific gym class
+            return RedirectToAction(nameof(Details), new { id = gymClass.Id });
         }
 
         // GET: GymClasses
@@ -33,7 +88,12 @@ namespace Gymbokning.Controllers
                 return NotFound();
             }
 
-            var gymClass = await _context.GymClasses.FirstOrDefaultAsync(m => m.Id == id);
+            // Load the gym class with its attending members and their email information
+            var gymClass = await _context
+                .GymClasses.Include(g => g.AttendingMembers)
+                .ThenInclude(am => am.ApplicationUser) // Load related ApplicationUser data
+                .FirstOrDefaultAsync(g => g.Id == id);
+
             if (gymClass == null)
             {
                 return NotFound();
