@@ -27,6 +27,7 @@ namespace Gymbokning.Controllers
             _userManager = userManager;
         }
 
+        [Authorize]
         //BOOKING PASS
         public async Task<IActionResult> BookingToggle(int id)
         {
@@ -102,6 +103,7 @@ namespace Gymbokning.Controllers
             return View(gymClass);
         }
 
+        [Authorize]
         // GET: GymClasses/Create
         public IActionResult Create()
         {
@@ -124,6 +126,7 @@ namespace Gymbokning.Controllers
             return View(gymClass);
         }
 
+        [Authorize]
         // GET: GymClasses/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -178,6 +181,7 @@ namespace Gymbokning.Controllers
             return View(gymClass);
         }
 
+        [Authorize]
         // GET: GymClasses/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
