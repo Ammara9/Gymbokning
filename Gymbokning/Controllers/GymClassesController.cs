@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Gymbokning.Controllers
 {
+    [Authorize]
     public class GymClassesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -27,7 +28,6 @@ namespace Gymbokning.Controllers
             _userManager = userManager;
         }
 
-        [Authorize]
         //BOOKING PASS
         public async Task<IActionResult> BookingToggle(int id)
         {
@@ -75,6 +75,7 @@ namespace Gymbokning.Controllers
             return RedirectToAction(nameof(Details), new { id = gymClass.Id });
         }
 
+        [AllowAnonymous]
         // GET: GymClasses
         public async Task<IActionResult> Index()
         {
@@ -103,7 +104,7 @@ namespace Gymbokning.Controllers
             return View(gymClass);
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         // GET: GymClasses/Create
         public IActionResult Create()
         {
@@ -126,7 +127,7 @@ namespace Gymbokning.Controllers
             return View(gymClass);
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         // GET: GymClasses/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -181,7 +182,7 @@ namespace Gymbokning.Controllers
             return View(gymClass);
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         // GET: GymClasses/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
