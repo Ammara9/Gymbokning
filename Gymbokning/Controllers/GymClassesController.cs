@@ -82,6 +82,26 @@ namespace Gymbokning.Controllers
             return View(await _context.GymClasses.ToListAsync());
         }
 
+        public async Task<IActionResult> History()
+        {
+            return View(await _context.GymClasses.ToListAsync());
+        }
+
+        public async Task<IActionResult> BookedClasses()
+        {
+            // Get the logged-in user's ID
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Fetch classes that the user has booked
+            var bookedClasses = await _context
+                .GymClasses.Include(g => g.AttendingMembers)
+                .ThenInclude(am => am.ApplicationUser)
+                .Where(g => g.AttendingMembers.Any(am => am.ApplicationUserId == userId))
+                .ToListAsync();
+
+            return View(bookedClasses);
+        }
+
         // GET: GymClasses/Details/5
         public async Task<IActionResult> Details(int? id)
         {

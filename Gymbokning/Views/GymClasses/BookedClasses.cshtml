@@ -1,0 +1,42 @@
+﻿@model IEnumerable<Gymbokning.Models.GymClass>
+
+@{
+    ViewData["Title"] = "Booked Classes";
+}
+
+<h1>Your Booked Classes</h1>
+
+@if (!Model.Any())
+{
+    <p>You haven't booked any classes yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.First().Name)</th>
+                <th>@Html.DisplayNameFor(model => model.First().StartTime)</th>
+                <th>@Html.DisplayNameFor(model => model.First().Duration)</th>
+                <th>@Html.DisplayNameFor(model => model.First().Description)</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                    <td>@Html.DisplayFor(modelItem => item.StartTime)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Duration)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.Id">View Details</a>
+                        |
+                        <a asp-action="BookingToggle" asp-route-id="@item.Id">Unbook</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
