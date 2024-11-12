@@ -9,10 +9,12 @@
         public DateTime EndTime => StartTime + Duration; // EndTime beräknas från StartTime och Duration
         public string Description { get; set; }
 
-        public GymClass(string name, string description)
+        // Relation till ApplicationUser via kopplingstabellen
+        public ICollection<ApplicationUserGymClass> AttendingMembers { get; set; }
+
+        public GymClass()
         {
-            Name = name;
-            Description = description;
+            AttendingMembers = new List<ApplicationUserGymClass>(); // Initialisera kollektionen för att undvika null-referensfel.
         }
     }
 }
