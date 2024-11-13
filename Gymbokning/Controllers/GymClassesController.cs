@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Gymbokning.Data;
 using Gymbokning.Models;
+using Gymbokning.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +27,24 @@ namespace Gymbokning.Controllers
         {
             _context = context;
             _userManager = userManager;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var userId = _userManager.GetUserId(User); // Get the logged-in user's ID
+
+            // Await the ToListAsync call to ensure we get the actual list of GymClassViewModel
+            var gymClasses = await _context
+                .GymClasses.Select(g => new GymClassViewModel
+                {
+                    Id = g.Id,
+                    Name = g.Name,
+                    StartTime = g.StartTime,
+                    IsBooked = g.AttendingMembers.Any(am => am.ApplicationUserId == userId),
+                })
+                .ToListAsync(); // Await here to get the actual list of gym classes
+
+            return View(gymClasses); // Pass the list of gym classes to the view
         }
 
         //BOOKING PASS
@@ -77,10 +96,7 @@ namespace Gymbokning.Controllers
 
         [AllowAnonymous]
         // GET: GymClasses
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.GymClasses.ToListAsync());
-        }
+
 
         public async Task<IActionResult> History()
         {

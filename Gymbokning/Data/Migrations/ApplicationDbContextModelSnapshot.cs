@@ -110,7 +110,7 @@ namespace Gymbokning.Data.Migrations
 
                     b.HasIndex("GymClassId");
 
-                    b.ToTable("ApplicationUserGymClass");
+                    b.ToTable("ApplicationUserGymClass", (string)null);
                 });
 
             modelBuilder.Entity("Gymbokning.Models.GymClass", b =>
@@ -137,7 +137,7 @@ namespace Gymbokning.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GymClasses");
+                    b.ToTable("GymClasses", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

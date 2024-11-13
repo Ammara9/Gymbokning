@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Gymbokning.Models.GymClass>
+﻿@model List<Gymbokning.Models.ViewModels.GymClassViewModel>
 
 @{
     ViewData["Title"] = "Gym Classes";
@@ -37,7 +37,14 @@
                         <!-- Show buttons based on user authentication and roles -->
                     @if (User.Identity.IsAuthenticated)
                     {
-                                <a class="btn btn-success btn-sm" asp-action="BookingToggle" asp-route-id="@item.Id">..</a>
+                        @if (item.IsBooked)
+                        {
+                            <a class="btn btn-success btn-sm" asp-action="BookingToggle" asp-route-id="@item.Id">Unbook</a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-success btn-sm" asp-action="BookingToggle" asp-route-id="@item.Id">Book</a>
+                        }
 
                         @if (User.IsInRole("Admin"))
                         {
