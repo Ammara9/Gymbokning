@@ -37,7 +37,7 @@
                         <!-- Show buttons based on user authentication and roles -->
                     @if (User.Identity.IsAuthenticated)
                     {
-                                <a class="btn btn-success btn-sm" asp-action="BookingToggle" asp-route-id="@item.Id">Book/Unbook</a>
+                                <a class="btn btn-success btn-sm" asp-action="BookingToggle" asp-route-id="@item.Id">..</a>
 
                         @if (User.IsInRole("Admin"))
                         {

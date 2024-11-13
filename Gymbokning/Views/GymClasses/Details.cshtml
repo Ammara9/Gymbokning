@@ -37,13 +37,22 @@
     </dl>
 </div>
 
-<h3>Attending Members</h3>
-<ul>
-    @foreach (var attendee in Model.AttendingMembers)
+@if (User.Identity.IsAuthenticated)
+{
+
+
+    @if (User.IsInRole("Admin"))
     {
-        <li>@attendee.ApplicationUser.FullName</li>
+        <h3>Attending Members</h3>
+        <ul>
+            @foreach (var attendee in Model.AttendingMembers)
+            {
+                <li>@attendee.ApplicationUser.FullName</li>
+            }
+        </ul>
+
     }
-</ul>
+}
 
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |

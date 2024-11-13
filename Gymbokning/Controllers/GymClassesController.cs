@@ -84,7 +84,22 @@ namespace Gymbokning.Controllers
 
         public async Task<IActionResult> History()
         {
-            return View(await _context.GymClasses.ToListAsync());
+            // Get the logged-in user's ID
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            //get current date
+            var currentDateTime = DateTime.Now;
+
+            // Fetch classes that the user has booked
+            var history = await _context
+                .GymClasses.Include(g => g.AttendingMembers)
+                .ThenInclude(am => am.ApplicationUser)
+                .Where(g =>
+                    g.StartTime < currentDateTime
+                    && g.AttendingMembers.Any(am => am.ApplicationUserId == userId)
+                )
+                .ToListAsync();
+            return View(history);
         }
 
         public async Task<IActionResult> BookedClasses()
@@ -92,11 +107,17 @@ namespace Gymbokning.Controllers
             // Get the logged-in user's ID
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            //get current date
+            var currentDateTime = DateTime.Now;
+
             // Fetch classes that the user has booked
             var bookedClasses = await _context
                 .GymClasses.Include(g => g.AttendingMembers)
                 .ThenInclude(am => am.ApplicationUser)
-                .Where(g => g.AttendingMembers.Any(am => am.ApplicationUserId == userId))
+                .Where(g =>
+                    g.StartTime > currentDateTime
+                    && g.AttendingMembers.Any(am => am.ApplicationUserId == userId)
+                )
                 .ToListAsync();
 
             return View(bookedClasses);
