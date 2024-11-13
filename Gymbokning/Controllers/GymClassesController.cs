@@ -29,6 +29,7 @@ namespace Gymbokning.Controllers
             _userManager = userManager;
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             var userId = _userManager.GetUserId(User); // Get the logged-in user's ID
@@ -40,6 +41,8 @@ namespace Gymbokning.Controllers
                     Id = g.Id,
                     Name = g.Name,
                     StartTime = g.StartTime,
+                    Duration = g.Duration,
+                    Description = g.Description,
                     IsBooked = g.AttendingMembers.Any(am => am.ApplicationUserId == userId),
                 })
                 .ToListAsync(); // Await here to get the actual list of gym classes
@@ -75,6 +78,7 @@ namespace Gymbokning.Controllers
             {
                 // If already booked, unbook by removing from the join table
                 _context.Entry(existingBooking).State = EntityState.Deleted;
+                TempData["BookingMessage"] = "You have successfully unbooked from the class.";
             }
             else
             {
@@ -85,6 +89,7 @@ namespace Gymbokning.Controllers
                     ApplicationUserId = user.Id,
                 };
                 _context.Add(newBooking);
+                TempData["BookingMessage"] = "You have successfully booked the class.";
             }
 
             // Save changes to the database
@@ -94,10 +99,7 @@ namespace Gymbokning.Controllers
             return RedirectToAction(nameof(Details), new { id = gymClass.Id });
         }
 
-        [AllowAnonymous]
         // GET: GymClasses
-
-
         public async Task<IActionResult> History()
         {
             // Get the logged-in user's ID
@@ -178,6 +180,8 @@ namespace Gymbokning.Controllers
             if (ModelState.IsValid)
             {
                 _context.Add(gymClass);
+                TempData["CreateMessage"] = "You have Succesfully Created a Gym Class";
+
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }

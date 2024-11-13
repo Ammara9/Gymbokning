@@ -27,7 +27,14 @@ else
                     </div>
                     <div class="card-footer text-center">
                         <a class="btn btn-info btn-sm" asp-action="Details" asp-route-id="@item.Id">View Details</a>
-                        <a class="btn btn-warning btn-sm" asp-action="BookingToggle" asp-route-id="@item.Id">Unbook</a>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            @if (User.IsInRole("Admin"))
+                            {
+                                                <a class="btn btn-warning btn-sm" asp-action="BookingToggle" asp-route-id="@item.Id">Unbook</a>
+                            }
+                        }
+                        
                     </div>
                 </div>
             </div>
