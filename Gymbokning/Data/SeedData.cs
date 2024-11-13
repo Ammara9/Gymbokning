@@ -1,5 +1,9 @@
-﻿using Gymbokning.Models;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Gymbokning.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Gymbokning.Data
 {
@@ -12,9 +16,11 @@ namespace Gymbokning.Data
         public static async Task Init(ApplicationDbContext _context, IServiceProvider services)
         {
             context = _context;
-            if (context.Roles.Any())
-                return;
 
+            if (context.Roles.Any())
+                return; // Exit if roles already exist in the database
+
+            // Get role manager and user manager services
             roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
             userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
@@ -22,8 +28,10 @@ namespace Gymbokning.Data
             var adminEmail = "admin@Gymbokning.se";
             var userEmail = "user@Gymbokning.se";
 
+            // Add roles
             await AddRolesAsync(roleNames);
 
+            // Add admin and user accounts
             var admin = await AddAccountAsync(
                 adminEmail,
                 "Abcd_1234",
@@ -37,18 +45,9 @@ namespace Gymbokning.Data
                 "UserLastName"
             );
 
+            // Add users to roles
             await AddUserToRoleAsync(admin, "Admin");
             await AddUserToRoleAsync(user, "User");
-        }
-
-        private static async Task AddUserToRoleAsync(ApplicationUser user, string roleName)
-        {
-            if (!await userManager.IsInRoleAsync(user, roleName))
-            {
-                var result = await userManager.AddToRoleAsync(user, roleName);
-                if (!result.Succeeded)
-                    throw new Exception(string.Join("\n", result.Errors));
-            }
         }
 
         private static async Task AddRolesAsync(string[] roleNames)
@@ -57,9 +56,9 @@ namespace Gymbokning.Data
             {
                 if (await roleManager.RoleExistsAsync(roleName))
                     continue;
+
                 var role = new IdentityRole { Name = roleName };
                 var result = await roleManager.CreateAsync(role);
-
                 if (!result.Succeeded)
                     throw new Exception(string.Join("\n", result.Errors));
             }
@@ -93,6 +92,16 @@ namespace Gymbokning.Data
                 throw new Exception(string.Join("\n", result.Errors));
 
             return user;
+        }
+
+        private static async Task AddUserToRoleAsync(ApplicationUser user, string roleName)
+        {
+            if (!await userManager.IsInRoleAsync(user, roleName))
+            {
+                var result = await userManager.AddToRoleAsync(user, roleName);
+                if (!result.Succeeded)
+                    throw new Exception(string.Join("\n", result.Errors));
+            }
         }
     }
 }
