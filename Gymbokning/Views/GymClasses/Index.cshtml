@@ -1,69 +1,53 @@
 ﻿@model IEnumerable<Gymbokning.Models.GymClass>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Gym Classes";
 }
 
-<h1>Gym Classes</h1>
+<h2 class="py-4" >Available Gym Classes</h2>
+ @if (User.Identity.IsAuthenticated)
+                    {
+                              
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.StartTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Duration)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.StartTime)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Duration)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Description)
-                </td>
-                <td>
-                    <!-- Only show the links if the user is authenticated -->
-                    @if (User.Identity.IsAuthenticated)
-                    { if(User.IsInRole("Admin")) {
-                        <a asp-action="BookingToggle" asp-route-id="@item.Id">Book/Unbook</a>
-                        <span> | </span>
-                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                        <span> | </span>
-                        <a asp-action="Details" asp-route-id="@item.Id">Details</a>
-                        <span> | </span>
-                            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                        }
-                        else
+                        @if (User.IsInRole("Admin"))
                         {
-                         <a asp-action="BookingToggle" asp-route-id="@item.Id">Book/Unbook</a>
-
+                                       <p>
+    <a class="btn btn-dark" asp-action="Create">Create New</a>
+</p>
                         }
                     }
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+            <div class="col-md-4 mb-4">
+                <div class="card bg-light shadow-sm">
+                    <div class="card-header text-center bg-success text-white">
+                        <h4 class="card-title">@item.Name</h4>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Start Time:</strong> @item.StartTime.ToString("g")</p>
+                        <p><strong>Duration:</strong> @item.Duration</p>
+                        <p><strong> Description:</strong> @item.Description</p>
+                       
+
+                    </div>
+                    <div class="card-footer text-center">
+                        <!-- Show buttons based on user authentication and roles -->
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                                <a class="btn btn-success btn-sm" asp-action="BookingToggle" asp-route-id="@item.Id">Book/Unbook</a>
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                                        <a class="btn btn-info btn-sm" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                                        <a class="btn btn-secondary btn-sm" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                                        <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        }
+                    }
+                    </div>
+                </div>
+            </div>
+    }
+</div>
